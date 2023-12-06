@@ -5,8 +5,10 @@ const hbs = require("hbs");
 
 require("./db/conn");  //database db folder vitra ko sanga link
 const Register = require("./models/registers");
-const static_path = path.join(__dirname, "../public");  //.html ko lagi ho yo ra next line, delete gare sakeko  xa,
-app.use(express.static(static_path));                   // yo nahuda ne chalxa aile
+const {json} = require("express");
+
+const static_path = path.join(__dirname, "../public");  // for css
+app.use(express.static(static_path));                   // css lai ho
 
 const template_path = path.join(__dirname, "./templates/views");  //direct views xaina, template vitra views xa
 const partials_path = path.join(__dirname, "./templates/partials");// eauta matra . because one step matra bahira gayeko xa
@@ -23,10 +25,38 @@ app.get("/",(req,res) => {
     res.render("index");
 
 });
-app.get("/register", (req,res) => {
+ app.get("/register",(req,res) => {
     res.render("register");
-})
+ });
+
+ app.get("/login",(req,res) => {
+    res.render("login");
+ });
  
+// login checkk
+app.post("/login", async (req,res) => {
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
+        
+       const useremail = await Register.findOne({email:email});  //database ma vayeko data read
+    //    res.send(useremail); 
+    //    console.log(useremail); 
+
+    if(useremail.password === password) {
+        // res.status(201).render("index");
+        res.send("lo login vayo");
+    } else {
+        res.send("password or email wrong vayo");
+    }
+
+    } catch (error) {
+        res.status(400).send("invalid email");
+        
+    }
+})
+
+
 //create a new user in database
 app.post("/register", async (req,res) => {  //post method used, db ma store garna lai
     try {
@@ -36,7 +66,7 @@ app.post("/register", async (req,res) => {  //post method used, db ma store garn
         
         // const { username, email , password} = req.body;
         // console.log(username);
-        // console.log(email);
+        // console.log(email);scsdc
         // console.log(password);
 
       // const datasave =  res.send(`username: ${username}, email: ${email}, password : ${password}`); // Send a single response containing both username and email
